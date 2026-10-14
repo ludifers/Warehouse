@@ -1,117 +1,114 @@
-# CMake SFML Project Template
+# Warehouse Fleet Simulator
 
-This repository template should allow for a fast and hassle-free kick start of your next SFML project using CMake.
-Thanks to [GitHub's nature of templates](https://docs.github.com/en/repositories/creating-and-managing-repositories/creating-a-repository-from-a-template), you can fork this repository without inheriting its Git history.
+A C++17 warehouse simulation built with SFML 3. Configure a fleet of robots, watch them collect and deliver orders, and compare BFS and A* pathfinding under the same immediate warehouse conditions.
 
-The template starts out very basic, but might receive additional features over time:
+![Warehouse fleet simulation with five robots, a selected route, and live statistics](docs/warehouse-simulator.png)
 
-- Basic CMake script to build your project and link SFML on any operating system
-- Basic [GitHub Actions](https://github.com/features/actions) script for all major platforms
+## Features
 
-## Quick start
+- A 30-column by 20-row grid with walls, shelves, and open aisles.
+- Configurable fleets of 1–12 colored and numbered robots.
+- Random pickups beside shelves and a shared delivery station.
+- Autonomous BFS or A* navigation with occupancy checks and rotating movement priority.
+- Selected-robot route visualization and optional WASD control for Robot 1.
+- Configurable order targets, speeds, and gridlock timeouts.
+- Live performance statistics and fleet and per-robot results.
 
-### Command line
+## Build and run
 
-1. Install [Git](https://git-scm.com/downloads) and [CMake](https://cmake.org/download/). Use your system's package manager if available.
-2. Follow [GitHub's instructions](https://docs.github.com/en/repositories/creating-and-managing-repositories/creating-a-repository-from-a-template) for how to use their project template feature to create your own project. If you don't want to use GitHub, see the section below.
-3. Clone your new GitHub repo and open the repo in your text editor of choice.
-4. Open [CMakeLists.txt](CMakeLists.txt). Rename the project and the target name of the executable to whatever name you want. Make sure to change all occurrences.
-5. If you want to add or remove any .cpp files, change the source files listed in the `add_executable` call in CMakeLists.txt to match the source files your project requires. If you plan on keeping the default main.cpp file then no changes are required.
-6. If your code uses the Audio or Network modules then add `SFML::Audio` or `SFML::Network` to the `target_link_libraries` call alongside the existing `SFML::Graphics` library that is being linked.
-7. If you use Linux, install SFML's dependencies using your system package manager. On Ubuntu and other Debian-based distributions you can use the following commands:
-   ```
-   sudo apt update
-   sudo apt install \
-       libxrandr-dev \
-       libxcursor-dev \
-       libxi-dev \
-       libudev-dev \
-       libfreetype-dev \
-       libflac-dev \
-       libvorbis-dev \
-       libgl1-mesa-dev \
-       libegl1-mesa-dev \
-       libfreetype-dev \
-       libharfbuzz-dev \
-       libmbedtls-dev \
-       libssh2-1-dev
-   ```
-8. Configure and build your project. Most popular IDEs support CMake projects with very little effort on your part.
+Requirements: Git, CMake 3.28 or newer, a C++17-capable compiler, and internet access for the first configuration. CMake downloads SFML 3.1.0 through FetchContent.
 
-   - [VS Code](https://code.visualstudio.com) via the [CMake extension](https://code.visualstudio.com/docs/cpp/cmake-linux)
-   - [Visual Studio](https://docs.microsoft.com/en-us/cpp/build/cmake-projects-in-visual-studio?view=msvc-170)
-   - [CLion](https://www.jetbrains.com/clion/features/cmake-support.html)
-   - [Qt Creator](https://doc.qt.io/qtcreator/creator-project-cmake.html)
+On Windows, use a terminal configured for your compiler, such as Developer PowerShell for Visual Studio with the C++ development tools installed.
 
-   Using CMake from the command line is straightforward as well.
-   Be sure to run these commands in the root directory of the project you just created.
+```powershell
+git clone https://github.com/ludifers/Warehouse.git
+cd Warehouse
+cmake -B build -DSFML_BUILD_AUDIO=OFF -DSFML_BUILD_NETWORK=OFF
+cmake --build build --config Release
+```
 
-   ```
-   cmake -B build
-   cmake --build build
-   ```
+The simulator uses graphics, so audio and networking are disabled here. This also avoids the networking module's Mbed TLS dependency.
 
-9. Enjoy!
+With a Visual Studio multi-configuration build, launch:
 
-### Visual Studio
+```powershell
+.\build\bin\Release\main.exe
+```
 
-Using a Visual Studio workspace is the simplest way to get started on windows.
+For single-configuration generators, the executable is normally `build/bin/main.exe` on Windows or `build/bin/main` on Linux/macOS. Linux builds also require SFML's system development dependencies.
 
-1. Ensure you have the [required components installed](https://learn.microsoft.com/en-us/cpp/build/cmake-projects-in-visual-studio#installation).
-2. Follow [GitHub's instructions](https://docs.github.com/en/repositories/creating-and-managing-repositories/creating-a-repository-from-a-template) for how to use their project template feature to create your own project.
-3. If you have already cloned this repo, you can [open the folder](https://learn.microsoft.com/en-us/cpp/build/cmake-projects-in-visual-studio0#ide-integration).
-4. If not, you can [clone it directly in Visual Studio](https://learn.microsoft.com/en-us/visualstudio/get-started/tutorial-open-project-from-repo).
+### Fonts
 
-Visual Studio should automatically configure the CMake project, then you can build and run as normal through Visual Studio. See the links above for more details.
+The program tries common system fonts on Windows, Linux, and macOS. Fonts are not bundled. If no font loads, place an `arial.ttf` font you are permitted to use in the working directory from which you launch the program. Without a loaded font, shapes render but interface text does not.
 
-## Upgrading SFML
+## Setup options
 
-SFML is found via CMake's [FetchContent](https://cmake.org/cmake/help/latest/module/FetchContent.html) module.
-FetchContent automatically downloads SFML from GitHub and builds it alongside your own code.
-Beyond the convenience of not having to install SFML yourself, this ensures ABI compatibility and simplifies things like specifying static versus shared libraries.
+| Setting | Options |
+| --- | --- |
+| Robots | 1–12; default 5 |
+| Order target | 10–200 in increments of 10; default 50 |
+| Pathfinding | BFS or A*; default A* |
+| Speed | Slow: 0.24 s/cell; normal: 0.16 s/cell; fast: 0.09 s/cell |
+| Gridlock timeout | 6, 12, or 20 simulated seconds; default 12 |
 
-Modifying what version of SFML you want is as easy as changing the `GIT_TAG` argument.
-Currently it uses SFML 3 via the `3.1.0` tag.
+Use Up/Down to select a setting and Left/Right to change it, or click the setting arrows. Press Enter or click Start to launch.
 
-## But I want to...
+## Controls
 
-Modify CMake options by adding them as configuration parameters (with a `-D` flag) or by modifying the contents of CMakeCache.txt and rebuilding.
+| Key | Action |
+| --- | --- |
+| M | Toggle manual control for Robot 1 |
+| W / A / S / D | Move Robot 1 in manual mode |
+| Tab | Select the next robot's route |
+| 1 / 2 | Switch active pathfinding to BFS / A* |
+| P | Pause or resume |
+| R | Restart using the original setup settings |
+| Enter on results screen | Return to setup |
+| Escape | Exit |
 
-### Not use GitHub
+Pickup markers have yellow centers surrounded by the assigned robot's color. The purple cell is the delivery station. Cyan dots show the selected robot's planned route.
 
-You can use this project without a GitHub account by [downloading the contents](https://github.com/SFML/cmake-sfml-project/archive/refs/heads/master.zip) of the repository as a ZIP archive and unpacking it locally.
-This approach also avoids using Git entirely if you would prefer to not do that.
+## How it works
 
-### Change Compilers
+Each movement interval advances the simulation one step. Robots automatically collect orders at their pickups and deliver them at the station. After delivery, a robot receives another random pickup, avoiding assignments currently held by other robots when possible.
 
-See the variety of [`CMAKE_<LANG>_COMPILER`](https://cmake.org/cmake/help/latest/variable/CMAKE_LANG_COMPILER.html) options.
-In particular you'll want to modify `CMAKE_CXX_COMPILER` to point to the C++ compiler you wish to use.
+Autonomous robots replan each step, treating other robots' current cells as temporary obstacles. Movement is processed sequentially with rotating priority. These rules prevent overlapping positions but do not guarantee a deadlock-free fleet.
 
-### Change Compiler Optimizations
+For each autonomous routing decision, both BFS and A* search the same snapshot. The selected algorithm supplies the route. A* uses Manhattan distance for the grid's four-direction movement. Both searches record explored nodes and execution time.
 
-CMake abstracts away specific optimizer flags through the [`CMAKE_BUILD_TYPE`](https://cmake.org/cmake/help/latest/variable/CMAKE_BUILD_TYPE.html) option.
-By default this project recommends `Release` builds which enable optimizations.
-Other build types include `Debug` builds which enable debug symbols but disable optimizations.
-If you're using a multi-configuration generator (as is often the case on Windows), you can modify the [`CMAKE_CONFIGURATION_TYPES`](https://cmake.org/cmake/help/latest/variable/CMAKE_CONFIGURATION_TYPES.html#variable:CMAKE_CONFIGURATION_TYPES) option.
+### End conditions
 
-### Change Generators
+A run ends when the order target is reached or one of these conditions occurs:
 
-While CMake will attempt to pick a suitable default generator, some systems offer a number of generators to choose from.
-Ubuntu, for example, offers Makefiles and Ninja as two potential options.
-For a list of generators, click [here](https://cmake.org/cmake/help/latest/manual/cmake-generators.7.html).
-To modify the generator you're using you must reconfigure your project providing a `-G` flag with a value corresponding to the generator you want.
-You can't simply modify an entry in the CMakeCache.txt file unlike the above options.
-Then you may rebuild your project with this new generator.
+- **Fleet deadlock:** A fleet with more than one robot, in fully autonomous mode, makes no movement for the selected timeout.
+- **Delivery station gridlock:** Manually controlled Robot 1 holds the station while another carrying robot remains within five grid steps for the selected timeout.
+- **Robot 1 trapped:** Manually controlled Robot 1 is on the station and every accessible neighboring cell remains occupied for approximately 1.5 simulated seconds.
 
-## More Reading
+## Performance statistics
 
-Here are some useful resources if you want to learn more about CMake:
+The dashboard reports completed orders, simulated time, orders per minute, cells traveled, wait events, and fleet utilization. Results also include average BFS/A* search times and each robot's deliveries, steps, and waits.
 
-- [Official CMake Tutorial](https://cmake.org/cmake/help/latest/guide/tutorial/)
-- [How to Use CMake Without the Agonizing Pain - Part 1](https://alexreinking.com/blog/how-to-use-cmake-without-the-agonizing-pain-part-1.html)
-- [How to Use CMake Without the Agonizing Pain - Part 2](https://alexreinking.com/blog/how-to-use-cmake-without-the-agonizing-pain-part-2.html)
-- [Better CMake YouTube series by Jefferon Amstutz](https://www.youtube.com/playlist?list=PL8i3OhJb4FNV10aIZ8oF0AA46HgA2ed8g)
+Simulated time is the step count multiplied by the movement interval, rather than measured wall-clock time. Utilization is successful movements divided by successful movements plus recorded waits. Manual inactivity without a movement attempt does not count as a wait. Search timings depend on the machine and workload; both algorithms run even when only one supplies the movement route.
 
-## License
+## Development process
 
-The source code is dual licensed under Public Domain and MIT -- choose whichever you prefer.
+I began with an SFML graphics test showing a green circle. A dependency download issue led me to temporarily disable audio and networking so I could continue with the graphics prototype.
+
+Next, I added a blue robot with WASD controls. Input checks every frame made movement too fast, so I introduced a clock-based delay of 0.15 seconds per cell. I then built the grid, walls, shelves, collision checks, random pickups, carrying state, and delivery counter.
+
+The second version expanded this into a configurable fleet. I added a setup screen, individual robot state, BFS and A* pathfinding, occupancy checks, and rotating movement priority. Route visualization and manual control made it possible to inspect navigation and deliberately test congestion.
+
+Finally, I added pathfinding measurements, gridlock detection, a live dashboard, and a results screen to explore how fleet size, routing choices, and shared aisles affect delivery performance.
+
+## Project structure
+
+```text
+src/main.cpp                 Simulation, pathfinding, rendering, and controls
+CMakeLists.txt               Build configuration and SFML dependency
+docs/warehouse-simulator.png Simulation screenshot
+LICENSE.md                   Existing starter-template license
+```
+
+## Credits and license
+
+Built using [SFML](https://github.com/SFML/SFML) and the [CMake SFML project template](https://github.com/SFML/cmake-sfml-project). See [LICENSE.md](LICENSE.md) for the repository's existing license terms. SFML and its dependencies have their own licenses.
